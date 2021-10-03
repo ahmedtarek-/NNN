@@ -72,6 +72,54 @@ class Network(object):
 
 
 
+    def backprop(self, x, y):
+        """This is the heart of the algorithm, there are four main steps to run
+            1. Feedforward starting from x to calculate all activations (and intermediate Zs)
+            2. Calculating the error (tiny change introduced by the good demon to reduce cost)
+                This error is derivative of cost in relation to a given Z (chain-rule to get
+                derivative of cost in relation to activation) results in
+            3. Propagating this error backward for the layers in between (multiplying weights
+                by the next layer's error)
+            4. Construct nabla(s) that constitues change of weights and biases needed (based on
+                the error calculated for each layer)
+        """
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+
+        activation = x
+        activations = [x]
+        zs = []
+
+        # 1. Feedforward
+        for b, w in zip(self.biases, self.weights):
+            z = np.dot(w, activation) + b
+            activation = sigmoid(z)
+
+            activations.append(activation)
+            zs.append(z)
+
+        # 2. Start back propagation
+        last_error = cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
+
+        nabla_b[-1] = last_error
+        nabla_w[-1] = np.dot(last_error, activations[-2].transpose())
+
+        for layer in xrange(2, self.num_layers):
+            z = zs[-layer]
+
+            error = np.dot(self.weights[-layer+1].transpose(), nabla_b[-layer+1]) * sigmoid_prime(z)
+
+            nabla_b[-layer] = error
+            nabla_w[-layer] = np.dot(error, activations[-layer-1].transpose())
+
+        return return (nabla_b, nabla_w)
+
+
+    def sigmoid_prime(z):
+        return sigmoid(x)*(1-sigmoid(z))
+
+    def cost_derivative(activation, y):
+        return (activation - y)
 
 
 
