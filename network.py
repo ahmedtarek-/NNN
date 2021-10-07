@@ -12,7 +12,7 @@ class Network(object):
     def __init__(self, sizes):
         self.sizes = sizes
         self.biases = [np.random.randn(y,1) for y in sizes[1:]]
-	self.weights = [np.random.randn(x,y) for x, y in zip(sizes[1:], sizes[:-1])]
+        self.weights = [np.random.randn(x,y) for x, y in zip(sizes[1:], sizes[:-1])]
 
     def sigmoid(z):
         return 1.0/(1.0+np.exp(-z))
@@ -22,8 +22,7 @@ class Network(object):
             a = sigmoid(np.dot(w,a) + b)
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None):
+    def SGD(self, training_data, epochs, mini_batch_size, eta, test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The "training_data" is a list of tuples
         "(x, y)" representing the training inputs and the desired
@@ -32,8 +31,8 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
-
-	if test_data: n_test = len(test_data)
+        if test_data:
+            n_test = len(test_data)
         n = len(training_data)
         for j in xrange(epochs):
             random.shuffle(training_data)
@@ -43,20 +42,19 @@ class Network(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
-                print "Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
+                print("Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test))
             else:
-                print "Epoch {0} complete".format(j)
+                print("Epoch {0} complete".format(j))
 
   
     def update_mini_batch(self, mini_batch, eta):
         """
         Calls backpropagation which returns delta matrices to be used to change
         the weights and the biases of the network.
-	
-	This happens in batches though; we keep accumulating the delta weight for
-	all elements in this batch (ex. -0.02 + 0.001 + 0.012). And ONLY after the
-	batch is done, we update the network with the accumulated delta.
+    
+        This happens in batches though; we keep accumulating the delta weight for
+        all elements in this batch (ex. -0.02 + 0.001 + 0.012). And ONLY after the
+        batch is done, we update the network with the accumulated delta.
         """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
@@ -66,10 +64,8 @@ class Network(object):
             nabla_w = [w+dw for w, dw in zip(nabla_w, delta_w)]
             nable_b = [b+db for b, db in zip(nable_b, delta_b)]
         
-	self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)] 
-	self.biases = [b - (eta/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)] 
-
-
+            self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)] 
+            self.biases = [b - (eta/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)] 
 
 
     def backprop(self, x, y):
@@ -112,8 +108,7 @@ class Network(object):
             nabla_b[-layer] = error
             nabla_w[-layer] = np.dot(error, activations[-layer-1].transpose())
 
-        return return (nabla_b, nabla_w)
-
+        return (nabla_b, nabla_w)
 
     def sigmoid_prime(z):
         return sigmoid(x)*(1-sigmoid(z))
